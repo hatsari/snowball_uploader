@@ -6,7 +6,8 @@ A script to move a billions files to snowball efficiently
 ## Introduction
 [ graphic ]
 
-*Snowball_uploader* is developed to move many of files efficiently to *Snowball* or *SnowballEdge* which is AWS's appliance to migrate petabyte files to S3. Especially, when there are millions of small files, it takes too long time to transfer them, then it will delay the project and cause high cost for lending the Snowball.  However, using *snowball_uploader*, you can shorten the transfer time.
+*Snowball_uploader* is developed to move many of files efficiently to *Snowball* or *SnowballEdge* which is AWS's appliance to migrate petabyte files to S3. Especially, when there are millions of small files, it takes too long time to transfer them, then it will delay the project and cause high cost for lending the Snowball.
+However, using *snowball_uploader*, you can shorten the transfer time. It archives the files into a part in memory, and sends big chunk, and aggregates in several tar files.
 
 ## USAGE
 ### Prerequisites
@@ -94,7 +95,27 @@ def rename_file(org_file):
 return target_file
 ```
 #### cp_snowball
+- *cp_snowball* parameter will transfer files to *snowball*
+![genlist](http://g.recordit.co/Gq1Z7Tv4MU.gif)
 
 ## HOW IT WORKS
 
+``` python
+    #print ('\n')
+    print ('genlist: ')
+    print ('this option will generate files which are containing target files list in %s'% (filelist_dir))
+    #print ('\n')
+    print ('cp_snowball: ')
+    print ('cp_snowball option will copy the files on server to snowball efficiently')
+    print ('the mechanism is here:')
+    print ('1. reads the target file name from the one filelist file in filelist directory')
+    print ('2. accumulates files to max_part_size in memory')
+    print ('3. if it reachs max_part_size, send it to snowball using MultiPartUpload')
+    print ('4. during sending data chunk, threads are invoked to max_thread')
+    print ('5. after complete to send, tar file is generated in snowball')
+    print ('6. then, moves to the next filelist file recursively')
+```
+
 ## Conclusion
+I'm not a professional programmer so it may have some flaw, error handling is very poor. And this script may consume huge amount of memory, then it can cause the freezing of system. so test it several times with sample data.
+When I used it in customer sites, it reduced the consuming time over 10 times. I hope you could get help from this script as well.
