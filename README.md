@@ -90,8 +90,9 @@ ec2-suer> cat f1_1.yaml
 - ./success_fl_1.yml_20200229_173222.log: ./success_fl_1.yml_20200229_173222.log
 - ./snowball_uploader_14_ing.py: ./snowball_uploader_14_ing.py
 ```
-  - the left is the original file name
-  - the right is the target file name, if you want to change the file name on the S3, you can change it with *rename_file* method.
+  - manifest file is written in yaml format
+  - the left key is the original file name
+  - the right value is the target file name, if you want to change the file name on the S3, you can change it with *rename_file* method.
 ```python
 def rename_file(org_file):
     target_file = org_file  ##
