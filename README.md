@@ -96,6 +96,10 @@ return target_file
 - *cp_snowball* parameter will transfer files to *snowball*
 ![genlist](http://g.recordit.co/Gq1Z7Tv4MU.gif)
 
+- When the script runs, it creates two log files, success_'file_name'_'timestamp'.log and error_'file_name'_'timestamp'.log
+  - success_'file_name'_'timestamp'.log: it contains the name of files which archived into tarfile successfully
+  - error_'file_name'_'timestamp'.log: it contains the name of files which is not exist in file system, even though written in filelist.
+  - with these logs, you can check which is transferred and which is not.
 ## HOW IT WORKS
 
 ``` python
@@ -115,5 +119,5 @@ return target_file
 ```
 
 ## Conclusion
-I'm not a professional programmer so it may have some flaw, error handling is very poor. And this script may consume huge amount of memory, then it can cause the freezing of system. so test it several times with sample data.
+I'm not a professional programmer so it may have some flaw, error handling is very poor. And this script may consume huge amount of memory if you set too high numbers of parameters (max_threads, max_part_size, and max_tarfile_size), then it can cause the freezing of system. so test it several times with sample data.
 When I used it in customer sites, it reduced the consuming time over 10 times. I hope you could get help from this script as well.
