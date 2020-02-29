@@ -76,14 +76,19 @@ fl_1.yml fl_2.yml fl_3.yml fl_4.yml fl_5.yml
 - the contents of file list
 ``` shell
 ec2-suer> cat f1_1.yaml
-./snowball_uploader_11_failed.py, ./snowball_uploader_11_failed.py
-./success_fl_1.txt_20200224_165943.log, ./success_fl_1.txt_20200224_165943.log
-./gen_filelist.py, ./gen_filelist.py
-./success_fl_1.txt_20200224_224920.log, ./success_fl_1.txt_20200224_224920.log
-./debug_part_10.log, ./debug_part_10.log
-./error_fl_1.txt_20200224_224549.log, ./error_fl_1.txt_20200224_224549.log
-./snowball_uploader_13_almost_success.py, ./snowball_uploader_13_almost_success.py
-./success_fl_1.txt_20200224_173633.log, ./success_fl_1.txt_20200224_173633.log
+- ./snowball_uploader_11_failed.py: ./snowball_uploader_11_failed.py
+- ./success_fl_2.yaml_20200226_002049.log: ./success_fl_2.yaml_20200226_002049.log
+- ./file_list.txt: ./file_list.txt
+- ./snowball-fl_1-20200218_151840.tar: ./snowball-fl_1-20200218_151840.tar
+- ./bytesio_test.py: ./bytesio_test.py
+- ./filelist_dir1_10000.txt: ./filelist_dir1_10000.txt
+- ./snowball_uploader_14_success.py: ./snowball_uploader_14_success.py
+- ./error_fl_1.txt_20200225_022018.log: ./error_fl_1.txt_20200225_022018.log
+- ./snowball_uploader_debug_success.py: ./snowball_uploader_debug_success.py
+- ./success_fl_1.txt_20200225_022018.log: ./success_fl_1.txt_20200225_022018.log
+- ./snowball_uploader_20_thread.py: ./snowball_uploader_20_thread.py
+- ./success_fl_1.yml_20200229_173222.log: ./success_fl_1.yml_20200229_173222.log
+- ./snowball_uploader_14_ing.py: ./snowball_uploader_14_ing.py
 ```
   - the left is the original file name
   - the right is the target file name, if you want to change the file name on the S3, you can change it with *rename_file* method.
