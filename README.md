@@ -65,7 +65,7 @@ ec2-user> python3 snowball_uploader.py genlist
 *genlist* parameter generates the manifest files containing original files and target files.
 this parameter should be run before coping the files.
 
-![genlist](https://recordit.co/joXk2dcJBB)
+![genlist](http://g.recordit.co/joXk2dcJBB.gif)
 
 - files list to be transferred
 files list split by the sum of files to fix the tar file size, max tar file size should be under 100GB.
