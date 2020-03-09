@@ -10,8 +10,8 @@ However, using *snowball_uploader*, you can shorten the transfer time. It archiv
 ### Performance Comparison between Uploading files individually and Uploading with script
 At first, I would show you the performance result. The 1st snowball result is measured when uploading each file while changing the name, and the 2nd result is measured when applying script which makes archive files with tar and send to snowball on memory. With below table and numbers, you will notice at least 7 times better performance with the 2nd option.
 
-- the 1st snowball performance: uploading each files while renaming it.
-- the 2nd snowball performance: uploading chunked files while archiving and renaming it.
+- the 1st snowball performance: uploading each files with **aws s3 cp**
+- the 2nd snowball performance: uploading chunked files **snowball_uploader draft version**
 ----
 
 | Target                       | No. of Files | Total Capacity | NAS -> Snowball Time   | Snowball -> S3 Time | Failed Objects |
