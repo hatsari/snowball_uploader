@@ -7,6 +7,22 @@ A script to move a billions files to snowball efficiently
 *Snowball_uploader* is developed to move many of files efficiently to *Snowball* or *SnowballEdge* which is AWS's appliance to migrate petabyte files to S3. Especially, when there are millions of small files, it takes too long time to transfer them, then it will delay the project and cause high cost for lending the Snowball.
 However, using *snowball_uploader*, you can shorten the transfer time. It archives the files into a part in memory, and sends big chunk, and aggregates in several tar files.
 
+### Performance Comparison between Uploading files individually and Uploading with script
+At first, I would show you the performance result. The 1st snowball result is measured when uploading each file while changing the name, and the 2nd result is measured when applying script which makes archive files with tar and send to snowball on memory. With below table and numbers, you will notice at least 7 times better performance with the 2nd option.
+
+- the 1st snowball performance: uploading each files while renaming it.
+- the 2nd snowball performance: uploading chunked files while archiving and renaming it.
+----
+
+| Target                       | No. of Files | Total Capacity | NAS -> Snowball Time   | Snowball -> S3 Time | Failed Objects |
+|------------------------------|:-------------:|:--------------:|:---------------:|:--------------:|----------------|
+| the 1st snowball performance | 1,956,7430     |2,408 GB        | 1W              | 113 hour       | 954            |
+| the 2nd snowball performance | approx. 119,577,235| 14,708 GB       | 1W              | 26 hour        | 0              |
+
+### Snowball Edge Manual
+- snowball edge data migration: https://d1.awsstatic.com/whitepapers/snowball-edge-data-migration-guide.pdf?did=wp_card&trk=wp_card
+
+
 ## USAGE
 ### Prerequisites
 - python3
