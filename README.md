@@ -16,7 +16,7 @@ At first, I would show you the performance result. The 1st snowball result is me
 
 | Target                       | No. of Files | Total Capacity | NAS -> Snowball Time   | Snowball -> S3 Time | Failed Objects |
 |------------------------------|:-------------:|:--------------:|:---------------:|:--------------:|----------------|
-| the 1st snowball performance | 1,956,7430     |2,408 GB        | 1W              | 113 hour       | 954            |
+| the 1st snowball performance | 19,567,430     |2,408 GB        | 1W              | 113 hour       | 954            |
 | the 2nd snowball performance | approx. 119,577,235| 14,708 GB       | 1W              | 26 hour        | 0              |
 
 ### Snowball Edge Manual
