@@ -44,15 +44,15 @@ import shutil
 import threading
 import time
 
-bucket_name = "your-own-dest-seoul"
+bucket_name = "your-own-dest"
 session = boto3.Session(profile_name='sbe1')
-#s3 = session.client('s3', endpoint_url='http://10.10.10.10:8080')
+s3 = session.client('s3', endpoint_url='http://10.10.10.10:8080')
 # or below
-s3 = session.client('s3', endpoint_url='https://s3.ap-northeast-2.amazonaws.com')
+#s3 = session.client('s3', endpoint_url='https://s3.ap-northeast-2.amazonaws.com')
 #s3 = boto3.client('s3', region_name='ap-northeast-2', endpoint_url='https://s3.ap-northeast-2.amazonaws.com', aws_access_key_id=None, aws_secret_access_key=None)
 target_path = '.'   ## very important!! change to your source directory
 max_tarfile_size = 10 * 1024 ** 3 # 10GB
-max_part_size = 300 * 1024 ** 2 # 100MB
+max_part_size = 300 * 1024 ** 2 # 300MB
 min_part_size = 5 * 1024 ** 2 # 5MB
 max_thread = 10  # max thread number
 sleep_time = 3   # thread sleep time when reaching max threads
