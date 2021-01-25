@@ -44,7 +44,6 @@ import os.path
 from datetime import datetime
 import sys
 import shutil
-#import threading
 import multiprocessing
 import time
 
@@ -55,16 +54,16 @@ s3 = session.client('s3', endpoint_url='http://10.10.10.10:8080')
 #s3 = session.client('s3', endpoint_url='https://s3.us-east-1.amazonaws.com')
 #s3 = boto3.client('s3', region_name='ap-northeast-2', endpoint_url='https://s3.ap-northeast-2.amazonaws.com', aws_access_key_id=None, aws_secret_access_key=None)
 target_path = '.'   ## very important!! change to your source directory
-max_tarfile_size = 10 * 1024 ** 3 # 10GiB
-max_part_size = 500 * 1000 ** 2 # 500MB
-min_part_size = 5 * 1024 ** 2 # 5MiB, Don't change it, it is limit of snowball
-max_process = 5  # max thread number
+max_tarfile_size = 10 * 1024 ** 3 # 10GiB, 100GiB is max limit of snowball
+max_part_size = 500 * 1000 ** 2 # 500MB, 500MiB is max limit of snowball
+max_process = 5  # max thread number, set the value to less than filelist files in filelist_dir 
 if os.name == 'nt':
     filelist_dir = "C:/tmp/fl_logdir_dkfjpoiwqjefkdjf/"  #for windows
 else:
     filelist_dir = '/tmp/fl_logdir_dkfjpoiwqjefkdjf/'    #for linux
 
 #### don't need to modify from here
+min_part_size = 5 * 1024 ** 2 # 5MiB, Don't change it, it is limit of snowball
 max_part_count = int(max_tarfile_size / max_part_size)
 current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
 parts = []
