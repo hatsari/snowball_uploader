@@ -1,11 +1,12 @@
 '''
 status: completed
-version: v2.3
+version: v23
 way: using multi-part uploading
 ref: https://gist.github.com/teasherm/bb73f21ed2f3b46bc1c2ca48ec2c1cf5
 changelog:
-  - 2020.02.27
-    - changing org_files_list to org_file in copy_to_sowball function to reduce memory consumtion
+  - 2021.01.25
+    - removing yaml feature, due for it to cause too much cpu consumtion and low performance
+    - fixing bug which use two profiles(sbe1, default), now only use "sbe1" profile
   - 2020.02.25
     - changing filelist file to contain the target filename
     - chaning filelist format to yaml
@@ -42,19 +43,18 @@ import sys
 import shutil
 import threading
 import time
-import yaml
 
-bucket_name = "your-own-dest-seoul"
+bucket_name = "your-own-dest"
 session = boto3.Session(profile_name='sbe1')
 s3 = session.client('s3', endpoint_url='http://10.10.10.10:8080')
 # or below
-#s3 = boto3.client('s3', endpoint_url='https://s3.ap-northeast-2.amazonaws.com')
+#s3 = session.client('s3', endpoint_url='https://s3.ap-northeast-2.amazonaws.com')
 #s3 = boto3.client('s3', region_name='ap-northeast-2', endpoint_url='https://s3.ap-northeast-2.amazonaws.com', aws_access_key_id=None, aws_secret_access_key=None)
 target_path = '.'   ## very important!! change to your source directory
 max_tarfile_size = 10 * 1024 ** 3 # 10GB
-max_part_size = 300 * 1024 ** 2 # 300MB
+max_part_size = 500 * 1000 ** 2 # 500Mb
 min_part_size = 5 * 1024 ** 2 # 5MB
-max_thread = 5  # max thread number
+max_thread = 10  # max thread number
 sleep_time = 3   # thread sleep time when reaching max threads
 if os.name == 'nt':
     filelist_dir = "C:/tmp/fl_logdir_dkfjpoiwqjefkdjf/"  #for windows
@@ -81,27 +81,26 @@ def gen_filelist():
     print('generating file list by size %s bytes' % max_tarfile_size)
     for r,d,f in os.walk(target_path):
         for file in f:
-            files_list = []
-            org_file_name = os.path.join(r,file)
-            target_file_name = rename_file(org_file_name)
-            fl_name = filelist_dir + '/' + fl_prefix + str(fl_index) + ".yml"
-            sum_size += os.path.getsize(org_file_name)
+            file_name = os.path.join(r,file)
+            fl_name = filelist_dir + '/' + fl_prefix + str(fl_index) + ".txt"
+            sum_size = sum_size + os.path.getsize(file_name)
             if max_tarfile_size < sum_size:
                 fl_index = fl_index + 1            
                 sum_size = 0
-            files_list.append({org_file_name: target_file_name})
-            print('%s, %s' % (org_file_name, target_file_name))
-            with open(fl_name, 'a', encoding='utf8') as fl_yaml:
-                yaml.dump(files_list, fl_yaml)
+            with open(fl_name, 'a', encoding='utf8') as fl_content:
+                target_file_name = rename_file(file_name)
+                fl_content.write(file_name + delimiter + target_file_name + '\n')                
+                print('%s, %s' % (file_name, target_file_name))
     print('file lists are generated!!')
     print('check %s' % filelist_dir)
     return os.listdir(filelist_dir)
 
 def get_org_files_list(source_file):
-    org_files_list = []
+    filelist = []
     with open(source_file, encoding='utf8') as fn:
-        org_files_list = yaml.load(fn, Loader=yaml.FullLoader)
-    return org_files_list
+        for line in fn.readlines():
+            filelist.append({line.split(delimiter)[0]:line.split(delimiter)[1].replace('\n','')})
+    return filelist
 
 def log_error(org_file, str_suffix):
     with open(error_file,'a+', encoding='utf8') as err:
@@ -141,7 +140,6 @@ def thread_max_check(sleep_time):
     else:
         #print ('current running thread: %s' % running_thread)
         pass
-
 def adjusting_parts_order(mpu_parts):
     return sorted(mpu_parts, key=lambda item: item['PartNumber'])
 
@@ -191,8 +189,8 @@ def copy_to_snowball(org_files_list):
                         #print('3.after fifo, recv_buf_pos : %s' % recv_buf.tell())
                         #print ('3. after fifo, recv_buf_size: %s' % len(recv_buf.getvalue()))
                     else:
-                        #print('aggregating files...')
-                        #print('thread numbers: %s' % threading.activeCount())
+                        print('accumulating files...')
+                        print('thread numbers: %s' % threading.activeCount())
                     mpu_parts = [ th.join() for th in mpu_threads ]
                 else:
                     log_error(org_file," does not exist\n")
