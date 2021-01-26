@@ -209,7 +209,7 @@ def snowball_uploader_help(**args):
     print ('1. reads the target file name from the one filelist file in filelist directory')
     print ('2. accumulates files to max_part_size in memory')
     print ('3. if it reachs max_part_size, send it to snowball using MultiPartUpload')
-    print ('4. during sending data chunk, threads are invoked to max_thread')
+    print ('4. tar files uploading to Snowball concurrently according to  max_process')
     print ('5. after complete to send, tar file is generated in snowball')
     print ('6. then, moves to the next filelist file recursively')
 
