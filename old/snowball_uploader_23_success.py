@@ -50,7 +50,7 @@ s3 = session.client('s3', endpoint_url='http://10.10.10.10:8080')
 # or below
 #s3 = session.client('s3', endpoint_url='https://s3.us-east-1.amazonaws.com')
 #s3 = boto3.client('s3', region_name='ap-northeast-2', endpoint_url='https://s3.ap-northeast-2.amazonaws.com', aws_access_key_id=None, aws_secret_access_key=None)
-target_path = '.'   ## very important!! change to your source directory
+target_path = '/data/backup/'   ## very important!! change to your source directory
 max_tarfile_size = 10 * 1024 ** 3 # 10GiB
 max_part_size = 500 * 1000 ** 2 # 500MB
 min_part_size = 5 * 1024 ** 2 # 5MiB
