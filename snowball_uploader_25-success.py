@@ -56,16 +56,16 @@ import time
 import scandir
 import math
 
-bucket_name = "your-own-dest-seoul"
+bucket_name = "your-own-bucket"
 session = boto3.Session(profile_name='sbe1')
-#s3 = session.client('s3', endpoint_url='http://10.10.10.10:8080')
+s3 = session.client('s3', endpoint_url='http://10.10.10.10:8080')
 # or below
-s3 = session.client('s3', endpoint_url='https://s3.ap-northeast-2.amazonaws.com')
+#s3 = session.client('s3', endpoint_url='https://s3.ap-northeast-2.amazonaws.com')
 #s3 = boto3.client('s3', region_name='ap-northeast-2', endpoint_url='https://s3.ap-northeast-2.amazonaws.com', aws_access_key_id=None, aws_secret_access_key=None)
 #target_path = 'dataset/mill/dataset2/fs1/d0001'   ## very important!! change to your source directory
-target_path = 'dataset/5m_files'   ## very important!! change to your source directory
-max_tarfile_size = 0.1 * 1024 ** 3 # 1GiB, 100GiB is max limit of snowball
-max_part_size = 20 * 1000 ** 2 # 500MB, 500MiB is max limit of snowball
+target_path = '/data/directory'   ## very important!! change to your source directory
+max_tarfile_size = 10 * 1024 ** 3 # 10GiB, 100GiB is max limit of snowball
+max_part_size = 500 * 1000 ** 2 # 500MB, 500MiB is max limit of snowball
 max_process = 5  # max thread number, set the value to less than filelist files in filelist_dir 
 if os.name == 'nt':
     filelist_dir = "C:/tmp/fl_logdir_dkfjpoiwqjefkdjf/"  #for windows
