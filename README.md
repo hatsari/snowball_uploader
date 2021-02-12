@@ -1,7 +1,49 @@
 # Snowball Uploader
 A script to move a billions files to snowball efficiently
-- Date: Feb 28, 2020
+- Date: Feb 11, 2021
 - Written by: Yongki Kim (hatsari@gmail.com)
+
+## Change Logs
+```
+  - 2021.02.10
+    - replacing os.path with scandir.path to improve performance of file listing
+  - 2021.02.09
+    - python2 compatibility for "open(filename, endoding)"
+  - 2021.02.01
+    - modifying to support Windows
+    - refactoring for more accurate defining of variables
+  - 2021.01.26
+    - multi processing support for parallel uploading of tar files
+    - relevant parameter: max_process
+  - 2021.01.25
+    - removing yaml feature, due for it to cause too much cpu consumtion and low performance
+    - fixing bug which use two profiles(sbe1, default), now only use "sbe1" profile
+    - showing progress
+  - 2020.02.25
+    - changing filelist file to contain the target filename
+  - 2020.02.24
+    - fixing FIFO error
+    - adding example of real snowball configuration
+  - 2020.02.22 - limiting multi-thread numbers
+    - adding multi-threading to improve performance 
+    - adding fifo operation to reducing for big file which is over max_part_size 
+  - 2020.02.19
+    - removing tarfiles_one_time logic
+    - spliting buffer by max_part_size
+  - 2020.02.18:
+    - supprt snowball limit:
+      - max_part_size: 512mb
+      - min_part_size: 5mb
+  - 2020.02.14: 
+    - modifying for python3 
+    - support korean in Windows
+  - 2020.02.12: adding features 
+    - gen_filelist by size
+  - 2020.02.10: changing filename from tar_to_s3_v7_multipart.py to snowball_uploader_8.py
+  - adding features which can split tar file by size and count.
+  - adding feature which create file list
+  - showing help message
+```
 
 ## Introduction
 *Snowball_uploader* is developed to move many of files efficiently to *Snowball* or *SnowballEdge* which is AWS's appliance to migrate petabyte files to S3. Especially, when there are millions of small files, it takes too long time to transfer them, then it will delay the project and cause high cost for lending the Snowball.
@@ -26,12 +68,14 @@ At first, I would show you the performance result. The 1st snowball result is me
 ## USAGE
 ### Prerequisites
 - python3
+  - python2 would work as well, but only English file name 
 - boto3
 - awscli
+- scandir
 ### Execution
 #### changing parameters
 ```python
-bucket_name = "your-own-dest-seoul"
+bucket_name = "your-own-bucket"
 session = boto3.Session(profile_name='sbe1')
 s3 = session.client('s3', endpoint_url='http://10.10.10.10:8080')
 # or below
@@ -41,8 +85,7 @@ target_path = '/move/to/s3/orgin/'   ## very important!! change to your source d
 max_tarfile_size = 10 * 1024 ** 3 # 10GB
 max_part_size = 300 * 1024 ** 2 # 300MB
 min_part_size = 5 * 1024 ** 2 # 5MB
-max_thread = 5  # max thread number
-sleep_time = 3   # thread sleep time when reaching max threads
+max_process = 5  # concurrent processes, set the value to less than filelist files in file list_dir
 if os.name == 'nt':
     filelist_dir = "C:/Temp/fl_logdir_dkfjpoiwqjefkdjf/"  #for windows
 else:
@@ -67,8 +110,7 @@ These parameters are crucial to run as you wish
       - snowball limit ref: https://docs.aws.amazon.com/snowball/latest/ug/limits.html
   - **min_part_size**: minimum multi part size, *Snowball* limits min-multi-part size to 5MB
       - ref: https://docs.aws.amazon.com/snowball/latest/ug/limits.html
-  - **max_thread**: numbers of threads, *snowball_uploader* uses multiple threads to increase the upload speed
-  - **sleep_time**: sleep time seconds, when thread count reaches max_thread count, it pauses for seconds of *sleep_time*
+  - **max_process**: numbers of concurrent processes, *snowball_uploader* uses multiple processes to increase the upload speed
   - **filelist_dir**: where filelist file generated
     - /tmp/fl_logdir_dkfjpoiwqjefkdjf/ directory is fixed, and this directory removed and re-created whenever you run the script with *genlist* parameter.
 
