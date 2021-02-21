@@ -1,12 +1,9 @@
 '''
-status: completed
+status: incompleted
 version: v24
 way: using multi-part uploading
 ref: https://gist.github.com/teasherm/bb73f21ed2f3b46bc1c2ca48ec2c1cf5
 changelog:
-  - 2021.01.26
-    - multi processing support for parallel uploading of tar files
-    - relevant parameter: max_process
   - 2021.01.25
     - removing yaml feature, due for it to cause too much cpu consumtion and low performance
     - fixing bug which use two profiles(sbe1, default), now only use "sbe1" profile
@@ -44,26 +41,30 @@ import os.path
 from datetime import datetime
 import sys
 import shutil
+#import threading
 import multiprocessing
 import time
 
-bucket_name = "your-own-bucket"
+#bucket_name = "your-own-dest-seoul"
+bucket_name = "alexkim-es-docs"
 session = boto3.Session(profile_name='sbe1')
-s3 = session.client('s3', endpoint_url='http://10.10.10.10:8080')
+#s3 = session.client('s3', endpoint_url='http://10.10.10.10:8080')
 # or below
-#s3 = session.client('s3', endpoint_url='https://s3.us-east-1.amazonaws.com')
+#s3 = boto3.client('s3', endpoint_url='https://s3.ap-northeast-2.amazonaws.com')
+s3 = session.client('s3', endpoint_url='https://s3.us-east-1.amazonaws.com')
 #s3 = boto3.client('s3', region_name='ap-northeast-2', endpoint_url='https://s3.ap-northeast-2.amazonaws.com', aws_access_key_id=None, aws_secret_access_key=None)
-target_path = '.'   ## very important!! change to your source directory
-max_tarfile_size = 10 * 1024 ** 3 # 10GiB, 100GiB is max limit of snowball
-max_part_size = 500 * 1000 ** 2 # 500MB, 500MiB is max limit of snowball
-max_process = 5  # max thread number, set the value to less than filelist files in filelist_dir 
+target_path = 'fs1'   ## very important!! change to your source directory
+max_tarfile_size = 1 * 1024 ** 3 # 10GB
+max_part_size = 300 * 1000 ** 2 # 500MB
+min_part_size = 5 * 1024 ** 2 # 5MB, Don't change it, it is limit of snowball
+max_process = 3  # max thread number
+sleep_time = 3   # thread sleep time when reaching max threads
 if os.name == 'nt':
     filelist_dir = "C:/tmp/fl_logdir_dkfjpoiwqjefkdjf/"  #for windows
 else:
     filelist_dir = '/tmp/fl_logdir_dkfjpoiwqjefkdjf/'    #for linux
 
 #### don't need to modify from here
-min_part_size = 5 * 1024 ** 2 # 5MiB, Don't change it, it is limit of snowball
 max_part_count = int(max_tarfile_size / max_part_size)
 current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
 parts = []
@@ -169,11 +170,16 @@ def copy_to_snowball(org_files_list):
                         print('%s is accumulating, size: %s' % (key_name, tar_file_size))
                         #print('chunk_count: %s ' % chunk_count)
                         for buf_index in range(chunk_count):
+                            #thread_max_check(sleep_time)
                             start_pos = buf_index * max_part_size
                             recv_buf.seek(start_pos,0)
+                            #mpu_threads.append(threading.Thread(target = upload_mpu, args = (mpu_id, recv_buf.read(max_part_size), parts_index)))
+                            #mpu_threads[-1].start()
                             mpu_parts = upload_mpu(mpu_id, recv_buf.read(max_part_size), parts_index)
                             parts_index += 1
+                            #print('2.thread numbers: %s' % threading.activeCount())
                         ####################
+                        #mpu_parts = [ th.join() for th in mpu_threads ]
                         buf_fifo(recv_buf)
                         recv_buf_size = recv_buf.tell()
                         #print('3.after fifo, recv_buf_pos : %s' % recv_buf.tell())
@@ -181,6 +187,7 @@ def copy_to_snowball(org_files_list):
                     else:
                         pass
                         #print('accumulating files...')
+                    #ykim#mpu_parts = [ th.join() for th in mpu_threads ]
                 else:
                     log_error(org_file," does not exist\n")
                     print (org_file + ' is not exist...............................................\n')
@@ -209,7 +216,7 @@ def snowball_uploader_help(**args):
     print ('1. reads the target file name from the one filelist file in filelist directory')
     print ('2. accumulates files to max_part_size in memory')
     print ('3. if it reachs max_part_size, send it to snowball using MultiPartUpload')
-    print ('4. tar files uploading to Snowball concurrently according to  max_process')
+    print ('4. during sending data chunk, threads are invoked to max_thread')
     print ('5. after complete to send, tar file is generated in snowball')
     print ('6. then, moves to the next filelist file recursively')
 
@@ -225,7 +232,6 @@ if __name__ == "__main__":
         max_source_files = len(source_files)
         source_files_count = 0
         task_process = []
-        task_index = 0
         for sf in source_files:
             error_file = ('error_%s_%s.log' % (sf, current_time))
             successlog_file = ('success_%s_%s.log' % (sf, current_time))
@@ -244,11 +250,7 @@ if __name__ == "__main__":
             print ('1. %s is done, transfered tar files: %s / %s' % (sf, source_files_count, max_source_files))
             print ('1. ###########################')
             parts = []
-            if task_index >= max_process:
-                pjoin = [ proc.join() for proc in task_process ]
-                task_index = 0
-                task_process = []
-            task_index += 1
+        pjoin = [ proc.join() for proc in task_process ]
         print ('part progess of last tar file could not reach the max, sorry for inconvenience')
     else:
         snowball_uploader_help()

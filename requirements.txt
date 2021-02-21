@@ -1,3 +1,2 @@
 awscli
 boto3
-scandir
