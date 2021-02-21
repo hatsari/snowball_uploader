@@ -1,10 +1,16 @@
 # Snowball Uploader
 A script to move a billions files to snowball efficiently
-- Date: Feb 11, 2021
+- Date: Feb 20, 2021
 - Written by: Yongki Kim (hatsari@gmail.com)
 
 ## Change Logs
 ```
+  - 2021.02.20
+    - save filelist_dir as filelist-currentdata.gz when executing genlist
+  - 2021.02.20
+    - performance improvement of genlist; dumping file list, not each line
+  - 2021.02.20
+    - replacing scandir.walk to os.walk. already os.walk module patched with scandir after python3.5
   - 2021.02.10
     - replacing os.path with scandir.path to improve performance of file listing
   - 2021.02.09
@@ -67,11 +73,10 @@ At first, I would show you the performance result. The 1st snowball result is me
 
 ## USAGE
 ### Prerequisites
-- python3
+- python3.5
   - python2 would work as well, but only English file name 
 - boto3
 - awscli
-- scandir
 ### Execution
 #### changing parameters
 ```python
